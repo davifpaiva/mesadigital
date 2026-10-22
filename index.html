@@ -27,8 +27,8 @@ body.sc #bar,body.sc #hint,body.sc #dice{left:50%}
 #col{width:38px;flex:none;margin:0 4px}.sep{width:1px;height:36px;background:#5a3a1c;margin:0 5px;flex:none}
 #hint{position:fixed;bottom:98px;left:calc((100% - 352px)/2);transform:translateX(-50%);background:#120c06dd;border:1px solid var(--gold);border-radius:99px;padding:5px 16px;font-size:14px;pointer-events:none;transition:left .3s;white-space:nowrap}
 #toast{position:fixed;top:16px;left:50%;transform:translate(-50%,-80px);padding:10px 22px;border-radius:99px;background:var(--or);color:#fff;font:700 13px var(--fh);transition:.35s;z-index:9}#toast.on{transform:translate(-50%,0)}
-#tg{position:fixed;top:20px;right:20px;width:42px;padding:7px 0;z-index:5}
-#side{position:fixed;top:12px;right:12px;bottom:12px;width:328px;display:flex;flex-direction:column;border-radius:18px;transition:transform .3s cubic-bezier(.2,.8,.2,1);overflow:hidden}#side.c{transform:translateX(calc(100% + 24px))}
+#tg{position:fixed;top:20px;right:20px;width:42px;padding:7px 0;z-index:30}
+#side{position:fixed;top:12px;right:12px;bottom:12px;width:min(328px,calc(100vw - 24px));display:flex;flex-direction:column;border-radius:18px;transform-origin:right top;transition:transform .25s,opacity .25s,visibility .25s;overflow:hidden}#side.c{opacity:0;visibility:hidden;pointer-events:none;transform:scale(.92)}
 #hd{display:flex;gap:10px;align-items:center;padding:12px 60px 12px 12px;border-bottom:1px solid #5a3a1c}#hd .sun{width:44px;height:44px;margin:0;flex:none}
 #rn{font:700 16px var(--fh);color:var(--or);margin-bottom:4px}#pl{display:flex;gap:4px;flex-wrap:wrap}#pl span{background:#3b2512;border:1px solid #6b4620;border-radius:99px;padding:0 9px;font-size:12px}
 #tabs{display:flex;background:#150d07}#tabs button{flex:1;background:0;border:0;padding:9px 0 7px;cursor:pointer;color:#a98a57;font-size:18px;border-bottom:3px solid transparent;transition:.2s}
@@ -51,6 +51,7 @@ canvas.tx{cursor:text}#ctx{position:fixed;top:18px;left:calc((100% - 352px)/2);t
 #dlg{position:fixed;inset:0;background:#000b;display:grid;place-items:center;z-index:20}#dlg .card{text-align:left}#fp{font-size:22px;padding:8px;text-align:center;background:#150d07;border-radius:8px;margin-top:6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .b.dng{background:linear-gradient(#e0483f,#9e1f18);color:#fff}
 #ctx{transition:opacity .15s}
+@media(max-width:760px){#bar,#hint,#dice{left:50%}#hint{white-space:normal;width:max-content;max-width:90vw;text-align:center}}
 </style></head><body>
 <svg width=0 height=0 style="position:absolute"><symbol id=sunS viewBox="0 0 100 100"><circle cx=50 cy=50 r=48 fill=#1f4a2f stroke=#120c06 stroke-width=3 /><polygon points="50,6 57.7,31.5 81.1,18.9 68.5,42.3 94,50 68.5,57.7 81.1,81.1 57.7,68.5 50,94 42.3,68.5 18.9,81.1 31.5,57.7 6,50 31.5,42.3 18.9,18.9 42.3,31.5" fill=#f5e43a stroke=#120c06 stroke-width=2 /><circle cx=50 cy=50 r=11 fill=#f5e43a stroke=#120c06 stroke-width=2 /><circle cx=50 cy=50 r=3.5 fill=#120c06 /></symbol></svg>
 <div id=lobby><div class=card><svg class=sun><use href="#sunS"/></svg><h1>Mesa Digital</h1><p class=sub>Sua mesa de RPG online</p>
@@ -230,7 +231,7 @@ function pd(d){if(d.t=='st'){S=d.s;names=d.w;if(local&&!S.maps[local])local=null
 function resize(){oc.width=cv.width=innerWidth;oc.height=cv.height=innerHeight;draw()}onresize=resize;
 const def=()=>({bg:'#1b130c',maps:{},cur:null,files:[],cell:1.5});
 async function go(m){nick=$('#nick').value.trim()||'Anônimo';code=$('#code').value.trim().toLowerCase().replace(/[^\w-]/g,'');if(!code)return alert('Digite o código da sala');localStorage.nick=nick;M=m;
-$('#lobby').hidden=1;$('#app').hidden=0;document.body.classList.toggle('p',!m);resize();
+$('#lobby').hidden=1;$('#app').hidden=0;document.body.classList.toggle('p',!m);resize();if(innerWidth<760)$('#tg').click();
 if(m){S=(await get('room:'+code))||def();if(S.cell>20)S.cell/=100;
 for(let m of Object.values(S.maps))if(m.i){let d=await get('b:'+m.i);if(!d)continue;let im=new Image();im.src=d;await im.decode();O(m).unshift({id:R(),ty:'i',i:m.i,x:0,y:0,w:im.width*G/(m.c||70),h:im.height*G/(m.c||70),r:0,pin:0,mp:1,own:nick});m.i=null}let sl=JSON.parse(localStorage.salas||'[]');if(!sl.includes(code))localStorage.salas=JSON.stringify([...sl,code]);
 peer=new Peer('mesarpg-'+code);peer.on('error',e=>alert(e.type=='unavailable-id'?'Essa sala já está aberta em outra aba ou aparelho.':'Erro: '+e.type));
